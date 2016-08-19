@@ -179,4 +179,15 @@ public class RemoteDownloadConfigBean {
   )
   public String errorArchiveDir = "";
 
+  @ConfigDef(
+          required = true,
+          type = ConfigDef.Type.BOOLEAN,
+          defaultValue = "false",
+          label = "Recursive File Lookup",
+          description = "Recursively lookup for files",
+          group = "REMOTE",
+          displayPosition = 70
+  )
+  public boolean recursiveLookup;
+
 }

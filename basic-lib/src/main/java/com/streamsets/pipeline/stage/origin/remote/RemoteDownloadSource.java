@@ -361,7 +361,10 @@ public class RemoteDownloadSource extends BaseSource {
 
   private Optional<RemoteFile> getNextFile() throws FileSystemException {
     if (fileQueue.isEmpty()) {
-      queueFiles();
+      if(conf.recursiveLookup)
+      queueFiles(remoteDir);
+      else
+        queueFiles();
     }
     return Optional.fromNullable(fileQueue.pollFirst());
   }
@@ -369,6 +372,8 @@ public class RemoteDownloadSource extends BaseSource {
   private void queueFiles() throws FileSystemException {
     remoteDir.refresh();
     for (FileObject remoteFile : remoteDir.getChildren()) {
+      if(remoteFile.getType().toString().equals("folder"))
+        continue;
       long lastModified = remoteFile.getContent().getLastModifiedTime();
       RemoteFile tempFile = new RemoteFile(remoteFile.getName().getBaseName(), lastModified, remoteFile);
       if (shouldQueue(tempFile)) {
@@ -379,7 +384,26 @@ public class RemoteDownloadSource extends BaseSource {
     }
   }
 
+  private void queueFiles(FileObject remoteDir) throws FileSystemException {
+    remoteDir.refresh();
+    for (FileObject remoteFile : remoteDir.getChildren()) {
+      if(remoteFile.getType().toString().equals("folder")) {
+        queueFiles(remoteFile);
+        continue;
+      }
+      long lastModified = remoteFile.getContent().getLastModifiedTime();
+      RemoteFile tempFile = new RemoteFile(remoteFile.getName().getBaseName(), lastModified, remoteFile);
+
+      if (shouldQueue(tempFile)) {
+        // If we are done with all files, the files with the final mtime might get re-ingested over and over.
+        // So if it is the one of those, don't pull it in.
+        fileQueue.add(tempFile);
+      }
+    }
+  }
+
   private boolean shouldQueue(RemoteFile remoteFile) throws FileSystemException {
+   // LOG.info("*******************************"+(remoteFile.lastModified > currentOffset.timestamp))+"---"+remoteFile.lastModified > currentOffset.timestamp);
     // Case 1: We started up for the first time, so anything we see must be queued
     return currentOffset == null ||
         // We poll for new files only when fileQueue is empty, so we don't need to check if this file is in the queue.
