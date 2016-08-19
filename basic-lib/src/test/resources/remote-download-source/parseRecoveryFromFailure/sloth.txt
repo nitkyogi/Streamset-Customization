@@ -1,5 +1,0 @@
-{
-  "name": "sloth",
-  "age": "5",
-  "characterisitics": ["cute", "slooooow", "sloooooow", "sloooooooow"]
-}
