@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main">
+  <echo file="/Users/Yogi/Documents/streamset_latest/datacollector-1.5.1.0/basic-lib/target/apache-rat.sh">#!/bin/bash
+                      if [ &quot;streamsets-datacollector-basic-lib&quot; == &quot;streamsets-datacollector&quot; ];
+                      then
+                      mvn apache-rat:check -N
+                      exit $?
+                      fi</echo>
+  <exec failonerror="true" dir="/Users/Yogi/Documents/streamset_latest/datacollector-1.5.1.0/basic-lib" executable="/bin/bash">
+    <arg line="/Users/Yogi/Documents/streamset_latest/datacollector-1.5.1.0/basic-lib/target/apache-rat.sh"/>
+  </exec>
+</target>
+</project>
